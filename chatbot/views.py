@@ -57,3 +57,4 @@ def chat_assistant(request):
     return render(request, 'chatbot/chatbot.html', {'users': users, 'response':response, 'user_message':user_message})
 
 
+#gggggg
