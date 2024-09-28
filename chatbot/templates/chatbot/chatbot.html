@@ -95,31 +95,20 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid chat-wrapper">
-        <div class="chat-container">
-            <div class="chat-header">
-                Banking Chatbot
-                
-                    {% for users in users %}
-                      {{ users }}
-                    {% endfor %}
-
-               
-                
-            </div>
-            <div class="chat-box" id="chat-box">
-                <!-- Chat messages will appear here -->
-                 
-               
-                {{ response }}
-         
-            </div>
-            <div class="chat-footer">
-                <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
-                <button onclick="sendMessage()">Send</button>
-            </div>
+    
+    
+    <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data"><!--use for enctype data image-->
+        <h1>Create table</h1>
+        {% csrf_token %}
+    
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Name</label>
+          <input type="text" name='name' required class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
         </div>
-    </div>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
 
     <script>
         function sendMessage() {
