@@ -5,5 +5,5 @@ from chatbot import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('chat_assistent/', views.chat_assistant,  name='chat_assistant'),  # URL for the chatbot page
-     path('send_message/', views.send_message, name='send_message'),
+    path('send_message/', views.send_message, name='send_message'),
 ]
