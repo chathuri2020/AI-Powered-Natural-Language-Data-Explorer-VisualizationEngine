@@ -109,7 +109,10 @@
             <div class="chat-header">
                 Banking Chatbot
                 
-                 
+                    {% for users in users %}
+                      {{ users }}
+                    {% endfor %}
+
                
                 
             </div>
@@ -117,7 +120,8 @@
                 <!-- Chat messages will appear here -->
           
                
-             
+                {{ response }}
+         
             </div>
             <div class="chat-footer">
                 <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
