@@ -34,10 +34,8 @@ def chat_assistant(request):
                     "Hi! How can I help you today?\n"]},
             ]
         )
-
         response = chat_session.send_message(message)
         response_text = response.text if response else "Sorry, I couldn't understand your query."
-
         return JsonResponse({'response': response_text})
 
     return render(request, 'chatbot/chatbot.html')
