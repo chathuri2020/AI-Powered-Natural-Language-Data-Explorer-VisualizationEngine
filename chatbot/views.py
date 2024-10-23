@@ -1,3 +1,4 @@
+import mysql.connector
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -13,6 +14,10 @@ def chat_assistant(request):
         from bardapi import Bard
         import google.generativeai as genai
         genai.configure(api_key="AIzaSyCPBau4ZNNhZ-CiaCdlvNDCG-BxHcjovqc")
+
+
+# SQL Implementation
+        import mysql.connector
 
         # Create the model
         generation_config = {
