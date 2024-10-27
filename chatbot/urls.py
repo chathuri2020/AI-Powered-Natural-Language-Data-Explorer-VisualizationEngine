@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from chatbot import views
 
 urlpatterns = [
@@ -10,4 +10,11 @@ urlpatterns = [
     path('chat_assistant/', views.chatbot_index, name='chatbot_index'),
     # path('send_message/', views.send_message, name='send_message'),
     # path('up/<int:f_oid>', views.updateView, name='update_url'),
+
+    # The home page
+    path('home/', views.index, name='home'),
+
+    # Matches any html file
+    re_path(r'^.*\.*', views.pages, name='pages'),
+
 ]
