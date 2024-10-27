@@ -9,5 +9,5 @@ urlpatterns = [
     # This must be 'chat_assistant'  # URL for the chatbot page
     path('chat_assistant/', views.chatbot_index, name='chatbot_index'),
     # path('send_message/', views.send_message, name='send_message'),
-   # path('up/<int:f_oid>', views.updateView, name='update_url'),
+    # path('up/<int:f_oid>', views.updateView, name='update_url'),
 ]
