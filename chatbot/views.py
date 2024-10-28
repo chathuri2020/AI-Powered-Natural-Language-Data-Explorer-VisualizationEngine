@@ -91,7 +91,7 @@ Foreign Key Relationships:
         # Step 4: MySQL database configuration
         db_config = {
             'host': '0.tcp.in.ngrok.io',  # ngrok TCP host
-            'port': 12370,                # ngrok TCP port
+            'port': 11341,                # ngrok TCP port
             'user': 'root',
             'password': '',
             'database': 'bankdb'
@@ -116,7 +116,7 @@ Foreign Key Relationships:
             conn.close()
 
             # Return the SQL query results as a JSON response
-            return JsonResponse({'sql': sql_query, 'response': result_list})
+            return JsonResponse({'sql': sql_query, 'response':result_list})
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err)})
     return render(request, 'chatbot/chatbot.html')
@@ -129,8 +129,7 @@ def dashboard(request):
     return HttpResponse(html_template.render(context, request))
 
 
-
-#@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
 
@@ -138,7 +137,7 @@ def index(request):
     return HttpResponse(html_template.render(context, request))
 
 
-#@login_required(login_url="/login/")
+# @login_required(login_url="/login/")
 def pages(request):
     context = {}
 
@@ -163,5 +162,3 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
-
-  
