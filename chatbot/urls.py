@@ -12,8 +12,8 @@ urlpatterns = [
     # path('up/<int:f_oid>', views.updateView, name='update_url'),
 
     # The home page
-    path('home/', views.index, name='home'),
-
+    path('', views.index, name='home'),
+    path('dashboard', views.dashboard, name='dashboard'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

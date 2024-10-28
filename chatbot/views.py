@@ -122,6 +122,13 @@ Foreign Key Relationships:
     return render(request, 'chatbot/chatbot.html')
 
 
+def dashboard(request):
+    context = {'segment': 'dashboard'}
+
+    html_template = loader.get_template('home/dashboard.html')
+    return HttpResponse(html_template.render(context, request))
+
+
 
 #@login_required(login_url="/login/")
 def index(request):
