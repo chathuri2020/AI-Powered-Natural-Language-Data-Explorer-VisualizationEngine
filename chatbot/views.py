@@ -101,22 +101,27 @@ Foreign Key Relationships:
             # Step 5: Connect to the MySQL database and execute the generated SQL
             conn = mysql.connector.connect(**db_config)
             cursor = conn.cursor()
-
-            # Execute the generated SQL query
             cursor.execute(sql_query)
             results = cursor.fetchall()
+            column_names = [i[0] for i in cursor.description]
 
-            # Prepare the results for output
-            result_list = []
+            # Generate HTML table
+            table_html = "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'><thead><tr>"
+            for col in column_names:
+                table_html += f"<th style='border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; text-align: left;'>{col}</th>"
+            table_html += "</tr></thead><tbody>"
             for row in results:
-                result_list.append(row)
+                table_html += "<tr>"
+                for value in row:
+                    table_html += f"<td style='border: 1px solid #dddddd; padding: 3px;'>{value}</td>"
+                table_html += "</tr>"
+            table_html += "</tbody></table>"
 
-            # Step 6: Close the cursor and connection
             cursor.close()
             conn.close()
 
             # Return the SQL query results as a JSON response
-            return JsonResponse({'sql': sql_query, 'response':result_list})
+            return JsonResponse({'sql': sql_query, 'response': table_html})
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err)})
     return render(request, 'chatbot/chatbot.html')
