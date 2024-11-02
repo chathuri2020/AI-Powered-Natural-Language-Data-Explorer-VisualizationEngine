@@ -12,13 +12,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
-#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -61,7 +57,7 @@ ROOT_URLCONF = 'document_intelligent_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR  / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,8 +78,12 @@ WSGI_APPLICATION = 'document_intelligent_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bankdb',          # Database name
+        'USER': 'root',             # MySQL username
+        'PASSWORD': '',             # MySQL password (if any)
+        'HOST': '127.0.0.1',        # Localhost
+        'PORT': '3306',
     }
 }
 
@@ -124,11 +124,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'staticfiles']  # For development
-STATIC_ROOT = BASE_DIR / 'staticfiles_collected'  # For collected static files in production
-
-
-
-
+# For collected static files in production
+STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
 
 
 # Default primary key field type
