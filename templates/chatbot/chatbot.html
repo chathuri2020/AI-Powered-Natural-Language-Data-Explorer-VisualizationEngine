@@ -151,6 +151,11 @@
             </div>
             <div class="chat-footer">
                 <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
+                <!--<input type="text" id="is_visual_not"  placeholder="Do you need to visualize data">-->
+                <select id="is_visual_not" name="options"  placeholder="Do you need to visualize data">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
                 <button id="send-button">Send</button>
 
             </div>
@@ -176,6 +181,7 @@
     $(document).ready(function() {
         $('#send-button').on('click', function() {
             const userInput = $('#user-input').val().trim();
+            const isVisual = $('#is_visual_not').val().trim();
             console.log(userInput);
             if (userInput) {
                 const userMessage = $('<div class="chat-message user"><p>' + userInput + '</p></div>');
@@ -188,13 +194,21 @@
                     url: '{% url "chat_assistant" %}',  // Use Django template tag to get URL
                     data: {
                         message: userInput,
+                        isVisual:isVisual,
                         csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
                     },
                     success: function(response) {
                         console.log(response);
                         const botMessage = $('<div class="chat-message bot"><p>' + response.response + '</p></div>');
                         $('#chat-box').append(botMessage);
+                        if (response.visualization) {
+                            const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" style="max-width: 100%; margin-top: 10px;">');
+                            const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
+                            $('#chat-box').append(vis);
+                        }vis
+
                         $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
+
                     },
                     error: function(error) {
                         console.error("Error:", error);

@@ -6,6 +6,8 @@ from django.template import loader
 from django.urls import reverse
 from django import template
 from django.contrib.auth.decorators import login_required
+import base64
+from io import BytesIO
 
 
 def chatbot_index(request):
@@ -18,8 +20,15 @@ def chat_assistant(request):
     from bardapi import Bard
     import google.generativeai as genai
     import mysql.connector
+    
+    #visulaization libraries
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    
     if request.method == 'POST':
         message = request.POST.get('message')
+        isVisual = request.POST.get('isVisual')
         genai.configure(api_key="AIzaSyCPBau4ZNNhZ-CiaCdlvNDCG-BxHcjovqc")
         generation_config = {
             "temperature": 1,
@@ -97,6 +106,38 @@ Foreign Key Relationships:
             'database': 'bankdb'
         }
         
+<<<<<<< HEAD
+=======
+        def visualize_data(df, chart_type='line', x_column=''	, y_column=''):
+            plt.switch_backend('Agg')
+            
+            if chart_type == 'line':
+                plt.figure(figsize=(10, 6))
+                sns.lineplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Line Plot of {y_column} vs {x_column}')
+            elif chart_type == 'bar':
+                plt.figure(figsize=(10, 6))
+                sns.barplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Bar Chart of {y_column} by {x_column}')
+            elif chart_type == 'scatter':
+                plt.figure(figsize=(10, 6))
+                sns.scatterplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Scatter Plot of {y_column} vs {x_column}')
+            else:
+                print("Unsupported chart type. Please choose 'line', 'bar', or 'scatter'.")
+
+            plt.xlabel(x_column)
+            plt.ylabel(y_column)
+            plt.tight_layout()
+            
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+            plt.close()
+
+            return image_base64
+>>>>>>> ef6244cfda52aa355a39648cf5dfbbbaddc0ea34
 
         try:
             # Step 5: Connect to the MySQL database and execute the generated SQL
@@ -105,6 +146,7 @@ Foreign Key Relationships:
             cursor.execute(sql_query)
             results = cursor.fetchall()
             column_names = [i[0] for i in cursor.description]
+            
 
             # Generate HTML table
             table_html = "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'><thead><tr>"
@@ -117,14 +159,28 @@ Foreign Key Relationships:
                     table_html += f"<td style='border: 1px solid #dddddd; padding: 3px;'>{value}</td>"
                 table_html += "</tr>"
             table_html += "</tbody></table>"
+            
+            #Genarte Visualizations 
+            df = pd.DataFrame(results, columns= column_names)
+            
+            if isVisual == "Yes" and not df.empty:
+                chart_type = 'bar'  # Set to the type of chart you need
+                x_column = column_names[0]  # Select appropriate column for x-axis
+                y_column = column_names[1] if len(column_names) > 1 else None  # y-axis column
+                image_base64 = visualize_data(df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+            else:
+                image_base64 = None
+
+
 
             cursor.close()
             conn.close()
 
             # Return the SQL query results as a JSON response
-            return JsonResponse({'sql': sql_query, 'response': table_html})
+            #return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
+            return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': column_names})
         except mysql.connector.Error as err:
-            return JsonResponse({'error': str(err), 'response': str(err)})
+            return JsonResponse({'error': str(err), 'response': str(err), 'visualization': None})
     return render(request, 'chatbot/chatbot.html')
 
 
