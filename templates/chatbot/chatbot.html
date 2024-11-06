@@ -203,8 +203,9 @@
                         $('#chat-box').append(botMessage);
                         if (response.visualization) {
                             const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" style="max-width: 100%; margin-top: 10px;">');
-                            $('#chat-box').append(visualizationImage);
-                        }
+                            const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
+                            $('#chat-box').append(vis);
+                        }vis
 
                         $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
 

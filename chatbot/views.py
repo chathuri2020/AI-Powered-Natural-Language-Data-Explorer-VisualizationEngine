@@ -174,7 +174,8 @@ Foreign Key Relationships:
             conn.close()
 
             # Return the SQL query results as a JSON response
-            return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
+            #return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
+            return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': column_names})
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err), 'visualization': None})
     return render(request, 'chatbot/chatbot.html')
