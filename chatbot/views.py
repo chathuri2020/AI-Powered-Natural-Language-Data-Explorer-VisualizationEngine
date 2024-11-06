@@ -20,15 +20,17 @@ def chat_assistant(request):
     from bardapi import Bard
     import google.generativeai as genai
     import mysql.connector
-    
-    #visulaization libraries
+
+    # visulaization libraries
     import pandas as pd
     import seaborn as sns
     import matplotlib.pyplot as plt
-    
+
     if request.method == 'POST':
         message = request.POST.get('message')
-        isVisual = request.POST.get('isVisual')
+
+        # isVisual = request.POST.get('isVisual')
+
         genai.configure(api_key="AIzaSyCPBau4ZNNhZ-CiaCdlvNDCG-BxHcjovqc")
         generation_config = {
             "temperature": 1,
@@ -99,15 +101,13 @@ Foreign Key Relationships:
 
         # Step 4: MySQL database configuration
         db_config = {
-            'host': 'localhost',   # ngrok TCP host
-            'port': 3306,                # ngrok TCP port
+            'host': '0.tcp.in.ngrok.io',  # ngrok TCP host
+            'port': 15055,                # ngrok TCP port
             'user': 'root',
-            'password': 'root',
+            'password': '',
             'database': 'bankdb'
         }
-        
-<<<<<<< HEAD
-=======
+
         def visualize_data(df, chart_type='line', x_column=''	, y_column=''):
             plt.switch_backend('Agg')
             
@@ -137,7 +137,8 @@ Foreign Key Relationships:
             plt.close()
 
             return image_base64
->>>>>>> ef6244cfda52aa355a39648cf5dfbbbaddc0ea34
+        
+        
 
         try:
             # Step 5: Connect to the MySQL database and execute the generated SQL
@@ -146,39 +147,42 @@ Foreign Key Relationships:
             cursor.execute(sql_query)
             results = cursor.fetchall()
             column_names = [i[0] for i in cursor.description]
-            
 
             # Generate HTML table
             table_html = "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'><thead><tr>"
             for col in column_names:
-                table_html += f"<th style='border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; text-align: left;'>{col}</th>"
+                table_html += f"<th style='border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2; text-align: left;'>{
+                    col}</th>"
             table_html += "</tr></thead><tbody>"
             for row in results:
                 table_html += "<tr>"
                 for value in row:
-                    table_html += f"<td style='border: 1px solid #dddddd; padding: 3px;'>{value}</td>"
+                    table_html += f"<td style='border: 1px solid #dddddd; padding: 3px;'>{
+                        value}</td>"
                 table_html += "</tr>"
             table_html += "</tbody></table>"
-            
-            #Genarte Visualizations 
-            df = pd.DataFrame(results, columns= column_names)
-            
-            if isVisual == "Yes" and not df.empty:
-                chart_type = 'bar'  # Set to the type of chart you need
+
+            # Genarte Visualizations
+            df = pd.DataFrame(results, columns=column_names)
+
+
+# check the user prompt has visulizations like line chart bar chart etc
+        # if(message):
+            if 'linechart' in message.lower() and not df.empty:
+                #visualize_data(df, chart_type='line', x_column='', y_column='')
+                chart_type = 'line'  # Set to the type of chart you need
                 x_column = column_names[0]  # Select appropriate column for x-axis
                 y_column = column_names[1] if len(column_names) > 1 else None  # y-axis column
                 image_base64 = visualize_data(df, chart_type=chart_type, x_column=x_column, y_column=y_column)
             else:
                 image_base64 = None
 
-
-
             cursor.close()
             conn.close()
 
             # Return the SQL query results as a JSON response
-            #return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
-            return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': column_names})
+            # return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
+            return JsonResponse({'sql': sql_query, 'response': table_html, 'visualization': image_base64})
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err), 'visualization': None})
     return render(request, 'chatbot/chatbot.html')

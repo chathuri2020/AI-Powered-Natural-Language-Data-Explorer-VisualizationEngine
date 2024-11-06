@@ -108,11 +108,61 @@
         border: none;
         border-radius: 10px;
     }
+
+    .prompt-button {
+        position: relative;
+        margin: 5px;
+        padding: 10px 20px;
+        background-color: transparent;
+        /* Transparent button */
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        /* No default border */
+        border-radius: 8px;
+        /* Rounded corners */
+        transition: color 0.3s ease, background-color 0.3s ease;
+        /* Smooth transition */
+        z-index: 0;
+        /* Ensure button text stays on top */
+        overflow: hidden;
+    }
+
+    /* Pseudo-element for gradient border */
+    .prompt-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: inherit;
+        /* Match the button's border radius */
+        padding: 2px;
+        /* Border thickness */
+        background: linear-gradient(45deg, black, blue);
+        /* Gradient border */
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        /* Mask to create transparent inner area */
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        z-index: -1;
+        /* Place gradient border behind the button content */
+    }
+
+    /* Hover effect */
+    .prompt-button:hover {
+        background-color: #888888a4;
+        color: white;
+    }
 </style>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2">
     <div class="d-block mb-2 mb-md-0">
-       
+
         <h2 class="h4">Chatbot</h2>
 
     </div>
@@ -140,9 +190,7 @@
 
     <div class="container-fluid chat-wrapper">
         <div class="chat-container">
-            <div class="chat-header">
-                Database Chatbot
-            </div>
+
             <div class="chat-box" id="chat-box">
                 <!-- Chat messages will appear here -->
 
@@ -152,12 +200,15 @@
             <div class="chat-footer">
                 <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
                 <!--<input type="text" id="is_visual_not"  placeholder="Do you need to visualize data">-->
-                <select id="is_visual_not" name="options"  placeholder="Do you need to visualize data">
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
+
                 <button id="send-button">Send</button>
 
+            </div>
+            <div class="dflex">
+                <!-- Buttons for predefined prompts -->
+                <button class="prompt-button" onclick="addPrompt('Create a  Barchart for show ')">Bar Chart</button>
+                <button class="prompt-button" onclick="addPrompt('Create a  Pie Chart for show ')">Pie Chart</button>
+                <button class="prompt-button" onclick="addPrompt('Create a  LineChart for show ')">Line Chart</button>
             </div>
         </div>
 
@@ -178,10 +229,11 @@
 
 
 <script>
-    $(document).ready(function() {
-        $('#send-button').on('click', function() {
+    $(document).ready(function () {
+        $('#send-button').on('click', function () {
             const userInput = $('#user-input').val().trim();
-            const isVisual = $('#is_visual_not').val().trim();
+            
+
             console.log(userInput);
             if (userInput) {
                 const userMessage = $('<div class="chat-message user"><p>' + userInput + '</p></div>');
@@ -194,29 +246,36 @@
                     url: '{% url "chat_assistant" %}',  // Use Django template tag to get URL
                     data: {
                         message: userInput,
-                        isVisual:isVisual,
                         csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
                     },
-                    success: function(response) {
+                    success: function (response) {
                         console.log(response);
                         const botMessage = $('<div class="chat-message bot"><p>' + response.response + '</p></div>');
                         $('#chat-box').append(botMessage);
                         if (response.visualization) {
                             const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" style="max-width: 100%; margin-top: 10px;">');
-                            const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
-                            $('#chat-box').append(vis);
-                        }vis
+                            //const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
+                            $('#chat-box').append(visualizationImage);
+                        }
 
                         $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
 
                     },
-                    error: function(error) {
+                    error: function (error) {
                         console.error("Error:", error);
                     }
                 });
             }
         });
     });
+
+
+    function addPrompt(text) {
+        const textArea = document.getElementById('user-input');
+        textArea.value += (textArea.value ? ' ' : '') + text;
+    }
+
+
 </script>
 
 
