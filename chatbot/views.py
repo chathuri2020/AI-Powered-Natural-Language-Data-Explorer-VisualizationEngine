@@ -96,6 +96,7 @@ Foreign Key Relationships:
             'password': 'root',
             'database': 'bankdb'
         }
+        
 
         try:
             # Step 5: Connect to the MySQL database and execute the generated SQL
