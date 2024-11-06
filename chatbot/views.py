@@ -18,8 +18,15 @@ def chat_assistant(request):
     from bardapi import Bard
     import google.generativeai as genai
     import mysql.connector
+    
+    #visulaization libraries
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    
     if request.method == 'POST':
         message = request.POST.get('message')
+        isVisual = request.POST.get('isVisual')
         genai.configure(api_key="AIzaSyCPBau4ZNNhZ-CiaCdlvNDCG-BxHcjovqc")
         generation_config = {
             "temperature": 1,
@@ -96,6 +103,26 @@ Foreign Key Relationships:
             'password': 'root',
             'database': 'bankdb'
         }
+        
+        def visualize_data(df, chart_type='line', x_column=None, y_column=None):
+            if chart_type == 'line':
+                plt.figure(figsize=(10, 6))
+                sns.lineplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Line Plot of {y_column} vs {x_column}')
+            elif chart_type == 'bar':
+                plt.figure(figsize=(10, 6))
+                sns.barplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Bar Chart of {y_column} by {x_column}')
+            elif chart_type == 'scatter':
+                plt.figure(figsize=(10, 6))
+                sns.scatterplot(data=df, x=x_column, y=y_column)
+                plt.title(f'Scatter Plot of {y_column} vs {x_column}')
+            else:
+                print("Unsupported chart type. Please choose 'line', 'bar', or 'scatter'.")
+
+            plt.xlabel(x_column)
+            plt.ylabel(y_column)
+            plt.show()
 
         try:
             # Step 5: Connect to the MySQL database and execute the generated SQL
@@ -104,6 +131,7 @@ Foreign Key Relationships:
             cursor.execute(sql_query)
             results = cursor.fetchall()
             column_names = [i[0] for i in cursor.description]
+            
 
             # Generate HTML table
             table_html = "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'><thead><tr>"
@@ -116,6 +144,11 @@ Foreign Key Relationships:
                     table_html += f"<td style='border: 1px solid #dddddd; padding: 3px;'>{value}</td>"
                 table_html += "</tr>"
             table_html += "</tbody></table>"
+            
+            #Genarte Visualizations 
+            df = pd.DataFrame(results, columns= column_names)
+
+
 
             cursor.close()
             conn.close()
@@ -123,7 +156,7 @@ Foreign Key Relationships:
             # Return the SQL query results as a JSON response
             return JsonResponse({'sql': sql_query, 'response': table_html})
         except mysql.connector.Error as err:
-            return JsonResponse({'error': str(err), 'response': str(err)})
+            return JsonResponse({'error': str(err), 'response': str(err), 'visual':isVisual})
     return render(request, 'chatbot/chatbot.html')
 
 
