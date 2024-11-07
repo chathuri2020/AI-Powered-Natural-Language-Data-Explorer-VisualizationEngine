@@ -102,28 +102,29 @@ Foreign Key Relationships:
 
         # Step 4: MySQL database configuration
         db_config = {
-            'host': 'localhost',   # ngrok TCP host
-            'port': 3306,                # ngrok TCP port
+            'host': '0.tcp.in.ngrok.io',  # ngrok TCP host
+            'port': 18640,                # ngrok TCP port
             'user': 'root',
-            'password': 'root',
+            'password': '',
             'database': 'bankdb'
         }
-        
+
         def contains_restricted_sql(sql_query):
-            restricted_commands = ["CREATE", "UPDATE", "DELETE","DROP"]
+            #restricted_commands = ["CREATE", "UPDATE", "DELETE", "DROP"]
+            restricted_commands = ["UPDATE", "DELETE", "DROP"]
             pattern = r'\b(?:' + '|'.join(restricted_commands) + r')\b'
             return bool(re.search(pattern, sql_query, re.IGNORECASE))
 
         # Check if the SQL query contains restricted commands
         if contains_restricted_sql(sql_query):
             return JsonResponse({
-                'response': 'You do not have permission to perform this operation. Please contact your database administration department.',
+                'response': '<div style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffdddd;">You do not have permission to perform this operation. Please contact your database administration department.</div>',
                 'visualization': None
             })
 
-        def visualize_data(df, chart_type='line', x_column=''	, y_column=''):
+        def visualize_data(df, chart_type='line', x_column='', y_column=''):
             plt.switch_backend('Agg')
-            
+
             if chart_type == 'line':
                 plt.figure(figsize=(10, 6))
                 sns.lineplot(data=df, x=x_column, y=y_column)
@@ -137,12 +138,13 @@ Foreign Key Relationships:
                 sns.scatterplot(data=df, x=x_column, y=y_column)
                 plt.title(f'Scatter Plot of {y_column} vs {x_column}')
             else:
-                print("Unsupported chart type. Please choose 'line', 'bar', or 'scatter'.")
+                print(
+                    "Unsupported chart type. Please choose 'line', 'bar', or 'scatter'.")
 
             plt.xlabel(x_column)
             plt.ylabel(y_column)
             plt.tight_layout()
-            
+
             buffer = BytesIO()
             plt.savefig(buffer, format='png')
             buffer.seek(0)
@@ -150,8 +152,6 @@ Foreign Key Relationships:
             plt.close()
 
             return image_base64
-        
-        
 
         try:
             # Step 5: Connect to the MySQL database and execute the generated SQL
@@ -182,13 +182,38 @@ Foreign Key Relationships:
 # check the user prompt has visulizations like line chart bar chart etc
         # if(message):
             if 'linechart' in message.lower() and not df.empty:
-                #visualize_data(df, chart_type='line', x_column='', y_column='')
+                # visualize_data(df, chart_type='line', x_column='', y_column='')
                 chart_type = 'line'  # Set to the type of chart you need
-                x_column = column_names[0]  # Select appropriate column for x-axis
-                y_column = column_names[1] if len(column_names) > 1 else None  # y-axis column
-                image_base64 = visualize_data(df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+                # Select appropriate column for x-axis
+                x_column = column_names[0]
+                y_column = column_names[1] if len(
+                    column_names) > 1 else None  # y-axis column
+                image_base64 = visualize_data(
+                    df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+            
             else:
-                image_base64 = None
+                if 'barchart' in message.lower() and not df.empty:
+                # visualize_data(df, chart_type='line', x_column='', y_column='')
+                    chart_type = 'bar'  # Set to the type of chart you need
+                    # Select appropriate column for x-axis
+                    x_column = column_names[0]
+                    y_column = column_names[1] if len(
+                        column_names) > 1 else None  # y-axis column
+                    image_base64 = visualize_data(
+                        df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+                else:
+                    if 'scatter' in message.lower() and not df.empty:
+                # visualize_data(df, chart_type='line', x_column='', y_column='')
+                        chart_type = 'scatter'  # Set to the type of chart you need
+                        # Select appropriate column for x-axis
+                        x_column = column_names[0]
+                        y_column = column_names[1] if len(
+                            column_names) > 1 else None  # y-axis column
+                        image_base64 = visualize_data(
+                            df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+                    
+                    else:
+                        image_base64 = None
 
             cursor.close()
             conn.close()
