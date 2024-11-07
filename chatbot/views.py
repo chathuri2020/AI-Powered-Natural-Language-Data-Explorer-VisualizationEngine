@@ -8,6 +8,7 @@ from django import template
 from django.contrib.auth.decorators import login_required
 import base64
 from io import BytesIO
+import re
 
 
 def chatbot_index(request):
@@ -101,12 +102,24 @@ Foreign Key Relationships:
 
         # Step 4: MySQL database configuration
         db_config = {
-            'host': '0.tcp.in.ngrok.io',  # ngrok TCP host
-            'port': 15055,                # ngrok TCP port
+            'host': 'localhost',   # ngrok TCP host
+            'port': 3306,                # ngrok TCP port
             'user': 'root',
-            'password': '',
+            'password': 'root',
             'database': 'bankdb'
         }
+        
+        def contains_restricted_sql(sql_query):
+            restricted_commands = ["CREATE", "UPDATE", "DELETE","DROP"]
+            pattern = r'\b(?:' + '|'.join(restricted_commands) + r')\b'
+            return bool(re.search(pattern, sql_query, re.IGNORECASE))
+
+        # Check if the SQL query contains restricted commands
+        if contains_restricted_sql(sql_query):
+            return JsonResponse({
+                'response': 'You do not have permission to perform this operation. Please contact your database administration department.',
+                'visualization': None
+            })
 
         def visualize_data(df, chart_type='line', x_column=''	, y_column=''):
             plt.switch_backend('Agg')
