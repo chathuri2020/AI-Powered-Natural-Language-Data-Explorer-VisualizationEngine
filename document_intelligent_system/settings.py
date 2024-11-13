@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'chatbot',
+    'anomaly_detection',
 
 ]
 
@@ -82,10 +83,25 @@ WSGI_APPLICATION = 'document_intelligent_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # or 'django.db.backends.postgresql', 'sqlite3', etc.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bankdb',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '127.0.0.1',  # or the IP address of your MySQL server
+        'PORT': '3306',
+        'OPTIONS': {
+            'ssl': {
+                'ssl_ca': '/path/to/ca-cert.pem',
+                'ssl_cert': '/path/to/client-cert.pem',
+                'ssl_key': '/path/to/client-key.pem',
+            }
+        },
     }
 }
+
+
+
 
 
 # Password validation
