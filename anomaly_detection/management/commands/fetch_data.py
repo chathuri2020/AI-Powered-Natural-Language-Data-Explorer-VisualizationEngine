@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 import pandas as pd
-from your_app.models import UserActivity  # Replace with the correct model
+from anomaly_detection.models import UserActivity  # Replace with the correct model
 
 class Command(BaseCommand):
     help = 'Fetches user activity data for anomaly detection'
