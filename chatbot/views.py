@@ -10,6 +10,12 @@ import base64
 from io import BytesIO
 import re
 
+def dashbord(request):
+    context = {'name': 'chathuri'}
+
+    html_template = loader.get_template('home/dashboard.html')
+    return HttpResponse(html_template.render(context, request))
+
 
 def chatbot_index(request):
     # Loads the initial chatbot page
@@ -226,11 +232,7 @@ Foreign Key Relationships:
     return render(request, 'chatbot/chatbot.html')
 
 
-def dashboard(request):
-    context = {'segment': 'dashboard'}
 
-    html_template = loader.get_template('home/dashboard.html')
-    return HttpResponse(html_template.render(context, request))
 
 
 # @login_required(login_url="/login/")
