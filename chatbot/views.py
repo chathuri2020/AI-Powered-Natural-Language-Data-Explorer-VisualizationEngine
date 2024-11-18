@@ -108,8 +108,8 @@ Foreign Key Relationships:
 
         # Step 4: MySQL database configuration
         db_config = {
-            'host': '127.0.0.1',  # ngrok TCP host
-            'port': 3306,                # ngrok TCP port
+            'host': '127.0.0.1',  
+            'port': 3306,                
             'user': 'root',
             'password': 'root',
             'database': 'bankdb'
