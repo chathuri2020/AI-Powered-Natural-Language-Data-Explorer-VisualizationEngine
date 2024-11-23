@@ -4,17 +4,16 @@ from sklearn.ensemble import IsolationForest
 import random
 from datetime import datetime, timedelta
 from django.db import connection
+from anomaly_detection.models import Transaction
 
 # Parameters for the dataset
 
 
 def fetch_data_from_db():
-    query = "SELECT * FROM transaction"
-    with connection.cursor() as cursor:
-            cursor.execute(query)
-            columns = [col[0] for col in cursor.description]
-            data = cursor.fetchall()
-            df = pd.DataFrame(data, columns=columns)
+    query = Transaction.objects.all()[:100]
+   
+    df = pd.DataFrame(list(query.values()))  # `values()` gives a list of dictionaries
+    
     return df
 
 
