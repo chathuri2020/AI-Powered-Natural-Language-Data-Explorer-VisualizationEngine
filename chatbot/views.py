@@ -10,6 +10,7 @@ import base64
 from io import BytesIO
 import re
 
+
 def dashbord(request):
     context = {'name': 'chathuri'}
 
@@ -42,7 +43,7 @@ def chat_assistant(request):
         generation_config = {
             "temperature": 1,
             "top_p": 0.95,
-            "top_k": 64,
+            "top_k": 40,
             "max_output_tokens": 8192,
         }
 
@@ -108,15 +109,15 @@ Foreign Key Relationships:
 
         # Step 4: MySQL database configuration
         db_config = {
-            'host': '127.0.0.1',  
-            'port': 3306,                
+            'host': '127.0.0.1',
+            'port': 3306,
             'user': 'root',
             'password': 'root',
             'database': 'bankdb'
         }
 
         def contains_restricted_sql(sql_query):
-            #restricted_commands = ["CREATE", "UPDATE", "DELETE", "DROP"]
+            # restricted_commands = ["CREATE", "UPDATE", "DELETE", "DROP"]
             restricted_commands = ["UPDATE", "DELETE", "DROP"]
             pattern = r'\b(?:' + '|'.join(restricted_commands) + r')\b'
             return bool(re.search(pattern, sql_query, re.IGNORECASE))
@@ -125,7 +126,8 @@ Foreign Key Relationships:
         if contains_restricted_sql(sql_query):
             return JsonResponse({
                 'response': '<div style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffdddd;">You do not have permission to perform this operation. Please contact your database administration department.</div>',
-                'visualization': None
+                'visualization': None,
+                'sql':sql_query
             })
 
         def visualize_data(df, chart_type='line', x_column='', y_column=''):
@@ -196,10 +198,10 @@ Foreign Key Relationships:
                     column_names) > 1 else None  # y-axis column
                 image_base64 = visualize_data(
                     df, chart_type=chart_type, x_column=x_column, y_column=y_column)
-            
+
             else:
                 if 'barchart' in message.lower() and not df.empty:
-                # visualize_data(df, chart_type='line', x_column='', y_column='')
+                    # visualize_data(df, chart_type='line', x_column='', y_column='')
                     chart_type = 'bar'  # Set to the type of chart you need
                     # Select appropriate column for x-axis
                     x_column = column_names[0]
@@ -209,7 +211,7 @@ Foreign Key Relationships:
                         df, chart_type=chart_type, x_column=x_column, y_column=y_column)
                 else:
                     if 'scatter' in message.lower() and not df.empty:
-                # visualize_data(df, chart_type='line', x_column='', y_column='')
+                        # visualize_data(df, chart_type='line', x_column='', y_column='')
                         chart_type = 'scatter'  # Set to the type of chart you need
                         # Select appropriate column for x-axis
                         x_column = column_names[0]
@@ -217,7 +219,7 @@ Foreign Key Relationships:
                             column_names) > 1 else None  # y-axis column
                         image_base64 = visualize_data(
                             df, chart_type=chart_type, x_column=x_column, y_column=y_column)
-                    
+
                     else:
                         image_base64 = None
 
@@ -230,9 +232,6 @@ Foreign Key Relationships:
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err), 'visualization': None})
     return render(request, 'chatbot/chatbot.html')
-
-
-
 
 
 # @login_required(login_url="/login/")
