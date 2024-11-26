@@ -191,11 +191,28 @@ Foreign Key Relationships:
                 # visualize_data(df, chart_type='line', x_column='', y_column='')
                 chart_type = 'line'  # Set to the type of chart you need
                 # Select appropriate column for x-axis
-                x_column = column_names[0]
-                y_column = column_names[1] if len(
-                    column_names) > 1 else None  # y-axis column
+                if 'vs' in message.lower():
+                    pattern = r"(\w+)\s+vs\s+(\w+)"
+                    match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    left_word = match.group(1)
+                    right_word = match.group(2)
+
+                else:
+                    left_word = None
+                    right_word = None
+
+                # Example usage
+
+                if match:
+                    x_axis = match.group(1).lower()
+                    y_axis = match.group(2).lower()
+                x_axis_column = next(
+                    (col for col in column_names if col.lower() == x_axis), None)
+                y_axis_column = next(
+                    (col for col in column_names if col.lower() == y_axis), None)
                 image_base64 = visualize_data(
-                    df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+                    df, chart_type=chart_type, x_column=x_axis_column, y_column=y_axis_column)
             
             else:
                 if 'barchart' in message.lower() and not df.empty:
