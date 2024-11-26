@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     path('dashboard/', views.anomaly_view, name='anomaly_view'),  # Keep only one definition
+    path('update-selection/', views.update_table_selection, name='update_table_selection'),
 ]

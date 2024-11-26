@@ -163,6 +163,17 @@
                                 <div class="col">
                                     <h2 class="fs-5 fw-bold mb-0"> Anomaly Detection Report</h2>
                                 </div>
+                                <div class="col">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <label for="TableSelection">Choose a Table:</label>
+                                        <select id="TableSelection" name="TableSelection" class="form-select" onchange="updateSelection(this.value)">
+                                            <option value="transaction" selected>Transaction</option>
+                                            <option value="loan">Loan</option>
+                                            <option value="order">Order</option>
+                                        </select>
+                                    </form>
+                                </div>
                                 <div class="col text-end">
                                     <a href="#" class="btn btn-sm btn-primary">{{ name }}</a>
                                 </div>
@@ -513,7 +524,58 @@
         </div>
     </div>
 
+    
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+    function updateSelection(selectedOption) {
+        // Use fetch to send the selected value to the backend
+        /*fetch('/update-selection/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token for security
+            },
+            body: JSON.stringify({ selected_option: selectedOption }) // Send selected option as JSON
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the backend (optional)
+            console.log('Response:', data);
+            alert(`Server response: ${data.message}`);
+        })
+        .catch(error => console.error('Error:', error));*//
+        $.ajax({
+            type: 'POST',
+            url: '{% url "anomaly_view" %}',  // Use Django template tag to get URL
+            data: {
+               // message: selectedOption,
+               message: "ttt",
+                csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
+            },
+            success: function (context) {
+                console.log(context.anomalies);
+                const botMessage = $('<div class="chat-message bot"><p>' + response.response + '</p></div>');
+                $('#chat-box').append(botMessage);
+                if (response.visualization) {
+                    const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" style="max-width: 100%; margin-top: 10px;">');
+                    //const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
+                    $('#chat-box').append(visualizationImage);
+                }
+
+                $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
+
+            },
+            error: function (error) {
+                console.error("Error:", error);
+            }
+        });
+
+    }
+</script>
+
+
+{% endblock javascripts %}
