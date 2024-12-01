@@ -87,6 +87,14 @@
         /* Align to the left */
     }
 
+    .chat-message.bot-err p {
+        background-color: #dd3652;
+        color: #ffffff;
+        margin-right: auto;
+        /* Align to the left */
+    }
+
+
     .chat-footer {
         display: flex;
         padding: 10px;
@@ -157,6 +165,37 @@
     .prompt-button:hover {
         background-color: #888888a4;
         color: white;
+    }
+
+
+    /* Style for small SQL label */
+    .sql-query-label {
+        background-color: #007bff;
+        color: #fff;
+        padding: 2px 5px;
+        font-size: 0.7em;
+        border-radius: 3px;
+        font-weight: bold;
+        margin-right: 5px;
+
+    }
+
+    /* Style for query text in ash color */
+    .query-text {
+        color: #6c757d;
+        font-size: 0.8em;
+        word-wrap: break-word;
+
+    }
+
+    /* Make the image responsive */
+    .chatbot-image {
+        max-width: 800px;
+        /* Make sure the image width is flexible */
+        height: 400px;
+        /* Maintain aspect ratio of the image */
+        margin-top: 10px;
+        /* Add space above the image */
     }
 </style>
 
@@ -232,7 +271,9 @@
     $(document).ready(function () {
         $('#send-button').on('click', function () {
             const userInput = $('#user-input').val().trim();
-            
+
+            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+            console.log(csrfToken);
 
             console.log(userInput);
             if (userInput) {
@@ -250,19 +291,47 @@
                     },
                     success: function (response) {
                         console.log(response);
-                        const botMessage = $('<div class="chat-message bot"><p>' + response.response + '</p></div>');
-                        $('#chat-box').append(botMessage);
+
+                        // Display SQL query as a small label
+                        if (response.sql) {
+                            const sqlLabel = $('<div class="chat-message bot"><span class="sql-query-label">SQL:</span><br><small class="query-text">' + response.sql + '</small></div>');
+                            $('#chat-box').append(sqlLabel);
+                        }
+
+                        if (response.response.includes("<table")) {
+                            const botMessage = $('<div class="chat-message bot"> <p>' + response.response + '</p></div>');
+                            $('#chat-box').append(botMessage);
+                        } else if (response.response.includes('restricted-cmd')) {
+                            const botMessage = $('<div class="chat-message bot"> <p>' + response.response + '</p></div>');
+                            $('#chat-box').append(botMessage);
+                        } else {
+                            // No 'error' variable defined, so this log will print an error message if none of the above conditions are met
+                            const errortest = "Oops! Something went wrong. It seems I can't fulfill your request. Let me know if you need assistance with something else";
+                            const errormsg = $('<div class="chat-message bot-err"><p>' + errortest + '</p></div>');
+                            $('#chat-box').append(errormsg);
+                        }
+
                         if (response.visualization) {
-                            const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" style="max-width: 100%; margin-top: 10px;">');
-                            //const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
+                            const visualizationImage = $('<img src="data:image/png;base64,' + response.visualization + '" alt="Visualization" class="chatbot-image">');
+                            const vis = $('<div class="chat-message bot"><p>' + response.visualization + '</p></div>');
                             $('#chat-box').append(visualizationImage);
                         }
 
+                        if (response.error) {
+                            const error = $('<div class="chat-message bot"><p>' + response.error + '</p></div>');
+                            $('#chat-box').append(eror);
+                        }
                         $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
-
                     },
+
                     error: function (error) {
                         console.error("Error:", error);
+                        const errortest = "Oops! Something went wrong. It seems I can't fulfill your request. Let me know if you need assistance with something else";
+                        const errormsg = $('<div class="chat-message bot-err"><p>' + errortest + '</p></div>');
+
+                        $('#chat-box').append(errormsg);
+                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
+
                     }
                 });
             }

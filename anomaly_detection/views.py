@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 
 def anomaly_view(request):
-    anomalies = detect_anomalies()
+    anomalies, chart_base64 = detect_anomalies()
     context = {
         'anomalies': anomalies.to_dict(orient='records'),
+        'chart_base64': chart_base64, 
         'name':"Chathuri"
     }
   

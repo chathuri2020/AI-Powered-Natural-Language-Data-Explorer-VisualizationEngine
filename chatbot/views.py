@@ -43,7 +43,7 @@ def chat_assistant(request):
         generation_config = {
             "temperature": 1,
             "top_p": 0.95,
-            "top_k": 40,
+            "top_k": 64,
             "max_output_tokens": 8192,
         }
 
@@ -117,17 +117,20 @@ Foreign Key Relationships:
         }
 
         def contains_restricted_sql(sql_query):
-            # restricted_commands = ["CREATE", "UPDATE", "DELETE", "DROP"]
             restricted_commands = ["UPDATE", "DELETE", "DROP"]
             pattern = r'\b(?:' + '|'.join(restricted_commands) + r')\b'
-            return bool(re.search(pattern, sql_query, re.IGNORECASE))
+            match = re.search(pattern, sql_query, re.IGNORECASE)
+            print(f"SQL Query: {sql_query}")
+            print(f"Pattern Match: {match}")
+            return bool(match)
+
 
         # Check if the SQL query contains restricted commands
         if contains_restricted_sql(sql_query):
             return JsonResponse({
-                'response': '<div style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffdddd;">You do not have permission to perform this operation. Please contact your database administration department.</div>',
+                'response': '<div class="restricted-cmd" style="color: red; font-weight: bold; padding: 10px; border: 1px solid red; background-color: #ffdddd;">You do not have permission to perform this operation. Please contact your database administration department.</div>',
                 'visualization': None,
-                'sql':sql_query
+                'sql': sql_query
             })
 
         def visualize_data(df, chart_type='line', x_column='', y_column=''):
@@ -193,12 +196,28 @@ Foreign Key Relationships:
                 # visualize_data(df, chart_type='line', x_column='', y_column='')
                 chart_type = 'line'  # Set to the type of chart you need
                 # Select appropriate column for x-axis
-                x_column = column_names[0]
-                y_column = column_names[1] if len(
-                    column_names) > 1 else None  # y-axis column
-                image_base64 = visualize_data(
-                    df, chart_type=chart_type, x_column=x_column, y_column=y_column)
+                if 'vs' in message.lower():
+                    pattern = r"(\w+)\s+vs\s+(\w+)"
+                    match = re.search(pattern, message, re.IGNORECASE)
+                if match:
+                    left_word = match.group(1)
+                    right_word = match.group(2)
 
+                else:
+                    left_word = None
+                    right_word = None
+
+                # Example usage
+
+                if match:
+                    x_axis = match.group(1).lower()
+                    y_axis = match.group(2).lower()
+                x_axis_column = next(
+                    (col for col in column_names if col.lower() == x_axis), None)
+                y_axis_column = next(
+                    (col for col in column_names if col.lower() == y_axis), None)
+                image_base64 = visualize_data(
+                    df, chart_type=chart_type, x_column=x_axis_column, y_column=y_axis_column)
             else:
                 if 'barchart' in message.lower() and not df.empty:
                     # visualize_data(df, chart_type='line', x_column='', y_column='')
@@ -228,6 +247,7 @@ Foreign Key Relationships:
 
             # Return the SQL query results as a JSON response
             # return JsonResponse({'sql': sql_query, 'response': table_html,'visualization': image_base64})
+            # return JsonResponse({'sql': sql_query, 'response': table_html, 'visualization': image_base64, 'left': left_word, 'right': right_word})
             return JsonResponse({'sql': sql_query, 'response': table_html, 'visualization': image_base64})
         except mysql.connector.Error as err:
             return JsonResponse({'error': str(err), 'response': str(err), 'visualization': None})

@@ -86,7 +86,11 @@
                     </div>
                     <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
                         <li class="nav-item me-2">
-                            <a href="dashboard.html" class="nav-link">Dashboard</a>
+                            <a href="{% url 'chatbot_index' %}" class="nav-link">ChatBot</a>
+                        </li>
+                    
+                        <li class="nav-item me-2">
+                            <a href="{% url 'anomaly_view' %}" class="nav-link">Dashboard</a>
                         </li>
                         <li class="nav-item me-2">
                             <a href="/page-sign-in.html" class="nav-link">Login</a>
