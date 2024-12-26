@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Show Page</title>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container-fluid chat-wrapper">
+  <div class="chat-container">
+      <div class="chat-header">
+          Banking Chatbot
+          
+              {% for users in users %}
+                {{ users }}
+              {% endfor %}
+
+         
+          
+      </div>
+      <div class="chat-box" id="chat-box">
+          <!-- Chat messages will appear here -->
+           
+         
+          {{ response }}
+   
+      </div>
+      <div class="chat-footer">
+          <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
+          <button onclick="sendMessage()">Send</button>
+      </div>
+  </div>
+</div>
+
+
+
+  <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data"><!--use for enctype data image-->
+    <center><h1>Chat Assistance</h1></center>
+
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label">Name</label>
+      <textarea name='name' required class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"></textarea>
+
+    </div>
+   
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <script>
+    function sendMessage() {
+        const userInput = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const message = userInput.value.trim();
+
+        if (message) {
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('chat-message', 'user');
+            userMessage.innerHTML = `<p>${message}</p>`;
+            chatBox.appendChild(userMessage);
+            userInput.value = '';
+
+            setTimeout(() => {
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('chat-message', 'bot');
+                botMessage.innerHTML = `
+                    <i class="fas fa-robot icon"></i>
+                    <p>{{ response }}</p>
+                `;
+                chatBox.appendChild(botMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+    }
+</script>
+
+{% endblock %}

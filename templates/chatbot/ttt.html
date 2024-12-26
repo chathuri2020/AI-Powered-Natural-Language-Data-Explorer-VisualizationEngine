@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Laravel AJAX CRUD</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center">Laravel AJAX CRUD</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="body">Body:</label>
+                    <textarea class="form-control" id="body" name="body" required></textarea>
+                </div>
+                <button type="submit" id="saveBtn" class="btn btn-success">Save</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="postList">
+                    <!-- Data will be loaded here via AJAX -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Fetch posts
+        fetchPosts();
+
+        // Save post
+        $('#postForm').on('submit', function(e) {
+            e.preventDefault();
+            let id = $('#post_id').val();
+            let url = id ? `/posts/${id}` : '/posts';
+            let type = id ? 'PUT' : 'POST';
+            let formData = {
+                title: $('#title').val(),
+                body: $('#body').val(),
+            };
+
+            $.ajax({
+                type: type,
+                url: url,
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    $('#postForm').trigger("reset");
+                    $('#saveBtn').text('Save');
+                    fetchPosts();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        // Edit post
+        $(document).on('click', '.edit-post', function() {
+            let id = $(this).data('id');
+            $.get(`/posts/${id}`, function(data) {
+                $('#title').val(data.title);
+                $('#body').val(data.body);
+                $('#post_id').val(data.id);
+                $('#saveBtn').text('Update');
+            });
+        });
+
+        // Delete post
+        $(document).on('click', '.delete-post', function() {
+            let id = $(this).data('id');
+            if(confirm("Are you sure want to delete this post?")) {
+                $.ajax({
+                    type: "DELETE",
+                    url: `/posts/${id}`,
+                    success: function(response) {
+                        fetchPosts();
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+        });
+
+        // Fetch posts
+        function fetchPosts() {
+            $.ajax({
+                type: "GET",
+                url: "/posts",
+                success: function(data) {
+                    let rows = '';
+                    $.each(data, function(key, post) {
+                        rows += `
+                            <tr>
+                                <td>${post.id}</td>
+                                <td>${post.title}</td>
+                                <td>${post.body}</td>
+                                <td>
+                                    <button data-id="${post.id}" class="btn btn-primary btn-sm edit-post">Edit</button>
+                                    <button data-id="${post.id}" class="btn btn-danger btn-sm delete-post">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    $('#postList').html(rows);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
