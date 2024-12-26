@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.urls import path
-from chatbot import views
+from django.urls import path, include  # Make sure to include 'include'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('chat_assistent/', views.chat_assistant),  # URL for the chatbot page
+    path('', include('chatbot.urls')),  # Include your chatbot app URLs
+    path('', include('anomaly_detection.urls')),
 ]
