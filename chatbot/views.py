@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 import base64
 from io import BytesIO
 import re
-from . import chat_utils  # Import the new module # Import the new module
+from . import chat_assistent  # Import the new module # Import the new module
 import mysql.connector
 import pandas as pd
 import seaborn as sns
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 import re
-from . import chat_utils
+from . import chat_assistent
 
 
 def dashbord(request):
@@ -40,10 +40,10 @@ def chat_assistant(request):
 
         # Configure Bard ONCE (using a function attribute):
         if not hasattr(chat_assistant, 'bard_configured'):
-            chat_utils.configure_bard()
+            chat_assistent.configure_bard()
             setattr(chat_assistant, 'bard_configured', True)
 
-        sql_query = chat_utils.bard_query_to_sql(message)
+        sql_query = chat_assistent.bard_query_to_sql(message)
 
         db_config = {
             'host': '127.0.0.1',
